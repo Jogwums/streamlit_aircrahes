@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd 
 import plotly.figure_factory as ff
 import plotly.express as px
+# from app import aircraft_manufacturer_incidents, aircraft_type_incidents
+
 
 @st.cache_data
 def load_data():
@@ -21,15 +23,14 @@ def load_data():
 
 df = load_data()
 st.title("Visuals")
-st.write(df.columns)
+df.columns
 # dispaly metrics 
 # total numbers 
 try:
     month_names = df['Month Name'].unique()
-    st.dataframe(month_names)
 
     # bar 1
-    data_monthly = px.bar(df, x='Month Name',y='Aboard',
+    data_monthly = px.histogram(df, x='Month Name',y='Aboard',text_auto='.2s',
                           title="Monthly Passenger Incidents")
     st.plotly_chart(data_monthly)
 
@@ -43,5 +44,30 @@ try:
                        title='Ground Casualties vs. Fatalities'
                        )
     st.plotly_chart(plot2)
+
+    st.sidebar.button("Refresh")
+
+    selected_months = st.sidebar.multiselect("Months",month_names,month_names[0])
+
+    filtered_months = df[df['Month Name'].isin(selected_months)]
+
+    # px.histogram
+    # bar 2 from filtered data
+    data_monthly = px.histogram(filtered_months, x='Month Name',y='Aboard',
+                          color="Quarter",
+                          title="Monthly Passenger Incidents")
+    st.plotly_chart(data_monthly)
+
+    # view aircraft dets
+    aircaft__ = st.session_state.aircraft_type_incidents
+    aircaft__table = aircaft__.reset_index()[:10]
+    st.dataframe(aircaft__table)
+    bar3 = px.histogram(aircaft__table, x='Aircraft', y='count',
+                        color='Aircraft', 
+                        title='top 10 problematic aircrafts',
+                        labels={'y':'nos'})
+    st.plotly_chart(bar3)
+
+
 except:
     st.error('This is an error', icon="🚨")

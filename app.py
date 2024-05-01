@@ -108,5 +108,10 @@ try:
     aircraft_manufacturer_incidents = df['Aircraft Manufacturer'].value_counts()
     aircraft_type_incidents = df['Aircraft'].value_counts()
 
+    if aircraft_type_incidents not in st.session_state:
+        st.session_state.aircraft_type_incidents = df['Aircraft'].value_counts()
+
+    
+
 except:
     st.error("Wait")
